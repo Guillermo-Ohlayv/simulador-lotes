@@ -98,6 +98,10 @@ export class Simulador {
     return this.lotes.length;
   }
 
+  getLotesTerminados() {
+    return this.lotesTerminados;
+  }
+
   getEstadoSimulacion() {
     return {
       loteActual: this.loteActual,

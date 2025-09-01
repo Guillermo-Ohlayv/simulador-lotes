@@ -101,9 +101,7 @@ const ProcesamientoLotes = () => {
               Procesos Terminados
             </div>
 
-          {/* Aqui quiero mapear los lotes que se guardaron en el simulador creando filas para cada lote. */}
           
-
 
             {/* Contenido de la tabla */}
             {!estado_simulacion.loteActual ? (
@@ -128,6 +126,7 @@ const ProcesamientoLotes = () => {
                estado_simulacion.loteActual.obtenerProcesosTerminados().length > 0 ? (
                 <ListaProcesosTerminados 
                   procesos={estado_simulacion.loteActual.obtenerProcesosTerminados()}
+                  lotesTerminados={ simulador.getLotesTerminados()}
                 />
               ) : (
                 <div style={{ padding: '4px 0' }}>-</div>
