@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Simulador } from '../models/Simulador';
 import FormularioCaptura from './FormularioCaptura';
 import FilaProceso from './FilaProceso';
-import ResumenLotes from './ResumenLotes';
+import ListaProcesosTerminados from './ListaProcesosTerminados';
 
 const ProcesamientoLotes = () => {
   const [simulador] = useState(new Simulador());
@@ -42,8 +42,8 @@ const ProcesamientoLotes = () => {
     setEstaCapturando(false);
   };
 
-  // Obtener estado estructurado del simulador
-  const estado = simulador.getEstadoSimulacion();
+  // Obtener estado_simulacion estructurado del simulador
+  const estado_simulacion = simulador.getEstadoSimulacion();
   
   // Calcular estadísticas para el formulario
   const procesosAgregados = simulador.lotes.reduce((sum, l) => sum + l.procesos.length, 0);
@@ -69,11 +69,13 @@ const ProcesamientoLotes = () => {
       ) : (
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-            <div><strong>No. lotes pendientes:</strong> {estado.lotesPendientes}</div>
-            <div><strong>Contador tiempo global:</strong> {estado.contadorGlobal}s</div>
+            <div><strong>No. lotes pendientes:</strong> {estado_simulacion.lotesPendientes}</div>
+            <div><strong>Contador tiempo global:</strong> {estado_simulacion.contadorGlobal}s</div>
           </div>
           <hr />
           
+        {/*  */}
+
           {/* Tabla principal */}
           <div style={{ 
             display: 'grid', 
@@ -99,30 +101,42 @@ const ProcesamientoLotes = () => {
               Procesos Terminados
             </div>
 
+          {/* Aqui quiero mapear los lotes que se guardaron en el simulador creando filas para cada lote. */}
+          
+
+
             {/* Contenido de la tabla */}
-            {!estado.loteActual ? (
+            {!estado_simulacion.loteActual ? (
               <>
                 <div style={{ padding: '4px 0' }}>No lote trabajando</div>
                 <div style={{ padding: '4px 0' }}>-</div>
                 <div style={{ padding: '4px 0' }}>-</div>
                 <div style={{ padding: '4px 0' }}>-</div>
-                <div style={{ padding: '4px 0' }}>-</div>
               </>
             ) : (
-              // Mostrar todos los procesos del lote actual (completos + pendientes)
-              estado.loteActual.obtenerProcesosCompletos().map((proceso) => (
-                <FilaProceso 
-                  key={proceso.id}
-                  proceso={proceso}
-                  esActual={proceso === estado.procesoActual}
-                  lotesTerminados={estado.lotesTerminados}
+              <FilaProceso 
+                key={estado_simulacion.procesoActual.id}
+                proceso={estado_simulacion.procesoActual}
+                esActual={true}
+              />
+                
+              )}
+            {/* Lista de procesos terminados */}
+            <div>
+              {estado_simulacion.loteActual && 
+               estado_simulacion.loteActual.obtenerProcesosTerminados() && 
+               estado_simulacion.loteActual.obtenerProcesosTerminados().length > 0 ? (
+                <ListaProcesosTerminados 
+                  procesos={estado_simulacion.loteActual.obtenerProcesosTerminados()}
                 />
-              ))
-            )}
+              ) : (
+                <div style={{ padding: '4px 0' }}>-</div>
+              )}
+            </div>
+              
           </div>
+          
 
-          {/* Resumen de lotes terminados */}
-          {/* <ResumenLotes lotesTerminados={estado.lotesTerminados} /> */}
         </div>
       )}
     </div>

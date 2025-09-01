@@ -49,6 +49,7 @@ const FormularioCaptura = ({ onAgregarProceso, onFinalizar, esIdDisponible, proc
     const onSubmit = (e) => {
         e.preventDefault();
         if (!validar()) return;
+        debugger;
         onAgregarProceso({
             id: typeof id === "string" ? (id.trim() === "" ? undefined : Number(id)) : id,
             nombreProgramador,

@@ -22,6 +22,11 @@ export class Lote {
     return this.procesos.shift();
   }
 
+  // Crear un metodo para regresar el primero proceso sin eliminarlo
+  obtenerPrimerProceso() {
+    return this.procesos[0];
+  }
+
   obtenerLoteId() {
     return this.id;
   }
@@ -30,7 +35,12 @@ export class Lote {
     return this.procesos_terminados;
   }
 
+  obtenerProcesos() {
+    return this.procesos;
+  }
+
   obtenerProcesosCompletos() {
+    debugger;
     return [...this.procesos_terminados, ...this.procesos];
   }
 
