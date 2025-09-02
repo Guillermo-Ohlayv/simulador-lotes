@@ -1,67 +1,46 @@
-import React, { useState, useEffect } from 'react';
-import { Simulador } from '../models/Simulador';
+import React, { useEffect } from 'react';
+import { useSimulador } from '../hooks/useSimulador';
 import FormularioCaptura from './FormularioCaptura';
 import FilaProceso from './FilaProceso';
 import ListaProcesosTerminados from './ListaProcesosTerminados';
 
 const ProcesamientoLotes = () => {
-  const [simulador] = useState(new Simulador());
-  const [estaCapturando, setEstaCapturando] = useState(true);
-  const [tick, setTick] = useState(0);
-  const [estaEjecutando, setEstaEjecutando] = useState(false);
+  const {
+    estado,
+    estadisticas,
+    agregarProceso,
+    iniciarSimulacion,
+    finalizarCaptura,
+    ejecutarPaso,
+    esIdDisponible
+  } = useSimulador();
 
   useEffect(() => {
     let intervalo;
-    if (estaEjecutando && !simulador.estaCapturando) {
+    if (estado.estaEjecutando && !estado.estaCapturando) {
       intervalo = setInterval(() => {
-        simulador.ejecutarPaso();
-        setTick(prev => prev + 1);
-
-        if (!simulador.procesoActual) {
-          setEstaEjecutando(false);
-        }
+        ejecutarPaso();
       }, 1000);
     }
 
     return () => clearInterval(intervalo);
-  }, [estaEjecutando, simulador]);
+  }, [estado.estaEjecutando, estado.estaCapturando, ejecutarPaso]);
 
-  const agregarProceso = (datosProceso) => {
-    simulador.agregarProceso(datosProceso);
-    setTick(prev => prev + 1);
-  };
-
-  const iniciarSimulacion = () => {
-    setEstaCapturando(false);
-    simulador.iniciarSimulacion();
-    setEstaEjecutando(true);
-    setTick(prev => prev + 1);
-  };
-
-  const finalizarCaptura = () => {
-    setEstaCapturando(false);
-  };
-
-  // Obtener estado_simulacion estructurado del simulador
-  const estado_simulacion = simulador.getEstadoSimulacion();
-  
-  // Calcular estadísticas para el formulario
-  const procesosAgregados = simulador.lotes.reduce((sum, l) => sum + l.procesos.length, 0);
-  const lotesLlenos = simulador.lotes.filter((l) => l.procesos.length === 4).length;
+  // Las funciones ya están disponibles desde el hook
 
   return (
     <div>
-      {estaCapturando ? (
+      {estado.estaCapturando ? (
         <div>
           <FormularioCaptura
             onAgregarProceso={agregarProceso}
             onFinalizar={finalizarCaptura}
-            esIdDisponible={(id) => simulador.esIdDisponible(id)}
-            procesosAgregados={procesosAgregados}
-            lotesLlenos={lotesLlenos}
+            esIdDisponible={esIdDisponible}
+            procesosAgregados={estadisticas.procesosAgregados}
+            lotesLlenos={estadisticas.lotesLlenos}
           />
           <div>
-            <button onClick={iniciarSimulacion} disabled={simulador.lotes.length === 0}>
+            <button onClick={iniciarSimulacion} disabled={estadisticas.totalLotes === 0}>
               Iniciar Simulación
             </button>
           </div>
@@ -69,8 +48,8 @@ const ProcesamientoLotes = () => {
       ) : (
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-            <div><strong>No. lotes pendientes:</strong> {estado_simulacion.lotesPendientes}</div>
-            <div><strong>Contador tiempo global:</strong> {estado_simulacion.contadorGlobal}s</div>
+            <div><strong>No. lotes pendientes:</strong> {estado.lotesPendientes}</div>
+            <div><strong>Contador tiempo global:</strong> {estado.contadorGlobal}s</div>
           </div>
           <hr />
           
@@ -104,7 +83,7 @@ const ProcesamientoLotes = () => {
           
 
             {/* Contenido de la tabla */}
-            {!estado_simulacion.loteActual ? (
+            {!estado.loteActual ? (
               <>
                 <div style={{ padding: '4px 0' }}>No lote trabajando</div>
                 <div style={{ padding: '4px 0' }}>-</div>
@@ -113,15 +92,15 @@ const ProcesamientoLotes = () => {
               </>
             ) : (
               <FilaProceso 
-                key={estado_simulacion.procesoActual.id}
-                proceso={estado_simulacion.procesoActual}
+                key={estado.procesoActual.id}
+                proceso={estado.procesoActual}
                 esActual={true}
               />
                 
               )}
             {/* Lista de procesos terminados */}
             <ListaProcesosTerminados 
-              lotesTerminados={simulador.getHistorialLotesArray()}
+              lotesTerminados={estado.historialLotes}
             />
           </div>
         </div>
