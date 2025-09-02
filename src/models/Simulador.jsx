@@ -2,8 +2,10 @@ import { Proceso } from './Proceso';
 import { Lote } from './Lote';
 
 export class Simulador {
+
   constructor() {
     this.lotes = [];
+    this.historialLotes = {};
     this.loteActual = null;
     this.procesoActual = null;
     this.lotesTerminados = []; // Array de lotes completados
@@ -69,6 +71,8 @@ export class Simulador {
     
     if (terminado) {
       // Agregar a procesos terminados del lote actual
+      this.historialLotes[this.loteActual.obtenerLoteId()] = this.loteActual.obtenerProcesosTerminados();
+
       this.loteActual.agregarProcesoTerminado(this.procesoActual);
       this.obtenerSiguienteProceso();
     }
@@ -100,6 +104,18 @@ export class Simulador {
 
   getLotesTerminados() {
     return this.lotesTerminados;
+  }
+
+  /**
+   * Devuelve el historial de lotes como un array de objetos:
+   * [{ loteId: <id>, procesosTerminados: [...] }, ...]
+   */
+  getHistorialLotesArray() {
+    return Object.entries(this.historialLotes).map(([loteId, procesosTerminados]) => {
+      const lote = new Lote(loteId);
+      lote.procesos_terminados = procesosTerminados;
+      return lote;
+    });
   }
 
   getEstadoSimulacion() {

@@ -120,24 +120,13 @@ const ProcesamientoLotes = () => {
                 
               )}
             {/* Lista de procesos terminados */}
-            <div>
-              {estado_simulacion.loteActual && 
-               estado_simulacion.loteActual.obtenerProcesosTerminados() && 
-               estado_simulacion.loteActual.obtenerProcesosTerminados().length > 0 ? (
-                <ListaProcesosTerminados 
-                  procesos={estado_simulacion.loteActual.obtenerProcesosTerminados()}
-                  lotesTerminados={ simulador.getLotesTerminados()}
-                />
-              ) : (
-                <div style={{ padding: '4px 0' }}>-</div>
-              )}
-            </div>
-              
+            <ListaProcesosTerminados 
+              lotesTerminados={simulador.getHistorialLotesArray()}
+            />
           </div>
-          
-
         </div>
       )}
+
     </div>
   );
 };
